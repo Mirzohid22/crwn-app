@@ -20,8 +20,8 @@ class App extends React.Component {
 
         userRef.onSnapshot((snapShot) => {
           setCurrentUser({
-              id: snapShot.id,
-              ...snapShot.data(),
+            id: snapShot.id,
+            ...snapShot.data(),
           });
         });
       } else {
@@ -41,14 +41,24 @@ class App extends React.Component {
         <Switch>
           <Route exact path="/" component={HomePage} />
           <Route exact path="/shop" component={ShopPage} />
-          <Route exact path="/signIn" render={() => this.props.currentUser ? <Redirect path="/" /> : <SignInAndSignUpPage />} />
+          <Route
+            exact
+            path="/signIn"
+            render={() =>
+              this.props.currentUser ? (
+                <Redirect exact to="/" />
+              ) : (
+                <SignInAndSignUpPage />
+              )
+            }
+          />
         </Switch>
       </div>
     );
   }
 }
 
-const mapToStateProps = state => ({
+const mapToStateProps = (state) => ({
   currentUser: state.user.currentUser,
 });
 
