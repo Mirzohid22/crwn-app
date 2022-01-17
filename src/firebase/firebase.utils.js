@@ -12,6 +12,8 @@ const config = {
   measurementId: "G-LLGJ05D05V",
 };
 
+firebase.initializeApp(config);
+
 export const createUserProfileDocument = async (userAuth, additionalData) => {
   if (!userAuth) return;
 
@@ -22,9 +24,8 @@ export const createUserProfileDocument = async (userAuth, additionalData) => {
   if (!snapShot.exists) {
     const { displayName, email } = userAuth;
     const createdAt = new Date();
-
     try {
-      userRef.set({
+      await userRef.set({
         displayName,
         email,
         createdAt,
@@ -34,22 +35,25 @@ export const createUserProfileDocument = async (userAuth, additionalData) => {
       console.log("error creating user", error.message);
     }
   }
+
   return userRef;
 };
 
-firebase.initializeApp(config);
-
-export const addCollectionAndDocuments = async (collectionKey, objectToAdd) => {
+export const addCollectionAndDocuments = async (
+  collectionKey,
+  objectsToAdd
+) => {
   const collectionRef = firestore.collection(collectionKey);
 
   const batch = firestore.batch();
-  objectToAdd.forEach((obj) => {
+  objectsToAdd.forEach((obj) => {
     const newDocRef = collectionRef.doc();
     batch.set(newDocRef, obj);
   });
 
   return await batch.commit();
 };
+
 export const convertCollectionsSnapshotToMap = (collections) => {
   const transformedCollection = collections.docs.map((doc) => {
     const { title, items } = doc.data();
@@ -67,14 +71,12 @@ export const convertCollectionsSnapshotToMap = (collections) => {
     return accumulator;
   }, {});
 };
+
 export const auth = firebase.auth();
 export const firestore = firebase.firestore();
 
 const provider = new firebase.auth.GoogleAuthProvider();
 provider.setCustomParameters({ prompt: "select_account" });
-export const signInWithGoogle = () => {
-  console.log("SigInWithGoogle");
-  auth.signInWithPopup(provider);
-};
+export const signInWithGoogle = () => auth.signInWithPopup(provider);
 
 export default firebase;
